@@ -10,7 +10,7 @@ import java.io.*;
 
 public class ExcelUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtil.class);
-    private static final String FILE_PATH = "testWrite.xlsx";
+    private static final String FILE_PATH = "temp/testWrite.xlsx";
 
     public void createExcel(Report report) {
 
