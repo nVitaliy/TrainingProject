@@ -1,11 +1,14 @@
 package com;
 
-import com.crud.CRUDexcel;
+import com.crud.ExcelUtil;
+import com.reports.Timesheet;
 
 public class Main {
 
     public static void main(String[] args) {
-        CRUDexcel cruDexcel = new CRUDexcel();
-        cruDexcel.createExcel();
+        ExcelUtil excelUtil = new ExcelUtil();
+        Timesheet timesheetReport = new Timesheet();
+
+        excelUtil.createExcel(timesheetReport);
     }
 }

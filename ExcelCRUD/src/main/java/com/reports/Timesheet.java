@@ -3,14 +3,15 @@ package com.reports;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Timesheet {
-    private final Logger logger = LoggerFactory.getLogger(Timesheet.class);
+public class Timesheet implements Report{
+    private static final Logger LOGGER = LoggerFactory.getLogger(Timesheet.class);
 
     private static final String[] titles = {
             "Person", "ID", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
@@ -22,9 +23,13 @@ public class Timesheet {
             {"Gisella Bronzetti", "GB", 4.0, 3.0, 1.0, 3.5, null, null, 4.0},
     };
 
-    public void createWorkBook(Workbook workbook){
+    @Override
+    public Workbook createWorkBook(){
+
+        Workbook workbook = new XSSFWorkbook();
         Map<String, CellStyle> styles = createStyles(workbook);
         Sheet sheet = workbook.createSheet("Timesheet");
+
         PrintSetup printSetup = sheet.getPrintSetup();
         printSetup.setLandscape(true);
         sheet.setFitToPage(true);
@@ -121,6 +126,7 @@ public class Timesheet {
             sheet.setColumnWidth(i, 6*256);  //6 characters wide
         }
         sheet.setColumnWidth(10, 10*256); //10 characters wide
+        return workbook;
     }
 
     private Map<String,CellStyle> createStyles(Workbook workbook) {
