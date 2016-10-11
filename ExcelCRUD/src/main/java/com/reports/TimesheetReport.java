@@ -10,70 +10,77 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Timesheet implements Report{
-    private static final Logger LOGGER = LoggerFactory.getLogger(Timesheet.class);
+public class TimesheetReport implements Report {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetReport.class);
 
     private static final String[] titles = {
             "Person", "ID", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",
             "Total\nHrs", "Overtime\nHrs", "Regular\nHrs"
     };
 
-    private static Object[][] sample_data = {
+    private static Object[][] sampleData = {
             {"Yegor Kozlov", "YK", 5.0, 8.0, 10.0, 5.0, 5.0, 7.0, 6.0},
             {"Gisella Bronzetti", "GB", 4.0, 3.0, 1.0, 3.5, null, null, 4.0},
     };
 
     @Override
-    public Workbook createWorkBook(){
+    public Workbook createWorkBook() {
 
         Workbook workbook = new XSSFWorkbook();
+
         Map<String, CellStyle> styles = createStyles(workbook);
-        Sheet sheet = workbook.createSheet("Timesheet");
 
-        PrintSetup printSetup = sheet.getPrintSetup();
-        printSetup.setLandscape(true);
-        sheet.setFitToPage(true);
-        sheet.setHorizontallyCenter(true);
+        createWorkSheet(workbook, styles);
 
-        //title row
-        Row titleRow = sheet.createRow(0);
-        titleRow.setHeightInPoints(45);
-        Cell titleCell = titleRow.createCell(0);
-        titleCell.setCellValue("Weekly Timesheet");
-        titleCell.setCellStyle(styles.get("title"));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$A$1:$L$1"));
+        return workbook;
+    }
+
+    private void createWorkSheet(Workbook workbook, Map<String, CellStyle> styles) {
+        Sheet sheet = workbook.createSheet("TimesheetReport");
+
+        setupPrint(sheet);
+        titleRow(styles, sheet);
 
         //header row
-        Row headerRow = sheet.createRow(1);
-        headerRow.setHeightInPoints(40);
-        Cell headerCell;
-        for (int i = 0; i < titles.length; i++) {
-            headerCell = headerRow.createCell(i);
-            headerCell.setCellValue(titles[i]);
-            headerCell.setCellStyle(styles.get("header"));
-        }
+        int rownum = getRownum(styles, sheet);
 
-        int rownum = 2;
-        for (int i = 0; i < 10; i++) {
-            Row row = sheet.createRow(rownum++);
-            for (int j = 0; j < titles.length; j++) {
-                Cell cell = row.createCell(j);
-                if(j == 9){
-                    //the 10th cell contains sum over week days, e.g. SUM(C3:I3)
-                    String ref = "C" +rownum+ ":I" + rownum;
-                    cell.setCellFormula("SUM("+ref+")");
-                    cell.setCellStyle(styles.get("formula"));
-                } else if (j == 11){
-                    cell.setCellFormula("J" +rownum+ "-K" + rownum);
-                    cell.setCellStyle(styles.get("formula"));
+        //row with totals below
+        rowWithTotalsBelow(styles, sheet, rownum);
+
+        //set sample data
+        setSampleData(sheet);
+
+        //finally set column widths, the width is measured in units of 1/256th of a character width
+        setColumnWidth(sheet);
+    }
+
+    private void setColumnWidth(Sheet sheet) {
+        sheet.setColumnWidth(0, 30 * 256); //30 characters wide
+        for (int i = 2; i < 9; i++) {
+            sheet.setColumnWidth(i, 6 * 256);  //6 characters wide
+        }
+        sheet.setColumnWidth(10, 10 * 256); //10 characters wide
+    }
+
+    private void setSampleData(Sheet sheet) {
+        for (int i = 0; i < sampleData.length; i++) {
+            Row row = sheet.getRow(2 + i);
+            for (int j = 0; j < sampleData[i].length; j++) {
+                if (sampleData[i][j] == null)
+                    continue;
+                if (sampleData[i][j] instanceof String) {
+                    row.getCell(j).setCellValue((String) sampleData[i][j]);
                 } else {
-                    cell.setCellStyle(styles.get("cell"));
+                    row.getCell(j).setCellValue((Double) sampleData[i][j]);
                 }
             }
         }
+    }
 
-        //row with totals below
-        Row sumRow = sheet.createRow(rownum++);
+    private void rowWithTotalsBelow(Map<String, CellStyle> styles, Sheet sheet, int rownum) {
+        int i;
+        i = rownum++;
+        Row sumRow = sheet.createRow(i);
         sumRow.setHeightInPoints(35);
         Cell cell;
         cell = sumRow.createCell(0);
@@ -84,10 +91,13 @@ public class Timesheet implements Report{
 
         for (int j = 2; j < 12; j++) {
             cell = sumRow.createCell(j);
-            String ref = (char)('A' + j) + "3:" + (char)('A' + j) + "12";
+            String ref = (char) ('A' + j) + "3:" + (char) ('A' + j) + "12";
             cell.setCellFormula("SUM(" + ref + ")");
-            if(j >= 9) cell.setCellStyle(styles.get("formula_2"));
-            else cell.setCellStyle(styles.get("formula"));
+            if (j >= 9) {
+                cell.setCellStyle(styles.get("formula_2"));
+            } else {
+                cell.setCellStyle(styles.get("formula"));
+            }
         }
         rownum++;
         sumRow = sheet.createRow(rownum++);
@@ -106,34 +116,60 @@ public class Timesheet implements Report{
         cell = sumRow.createCell(1);
         cell.setCellFormula("K13");
         cell.setCellStyle(styles.get("formula_2"));
+    }
 
-        //set sample data
-        for (int i = 0; i < sample_data.length; i++) {
-            Row row = sheet.getRow(2 + i);
-            for (int j = 0; j < sample_data[i].length; j++) {
-                if(sample_data[i][j] == null) continue;
-                if(sample_data[i][j] instanceof String) {
-                    row.getCell(j).setCellValue((String)sample_data[i][j]);
+    private int getRownum(Map<String, CellStyle> styles, Sheet sheet) {
+        Row headerRow = sheet.createRow(1);
+        headerRow.setHeightInPoints(40);
+        Cell headerCell;
+        for (int i = 0; i < titles.length; i++) {
+            headerCell = headerRow.createCell(i);
+            headerCell.setCellValue(titles[i]);
+            headerCell.setCellStyle(styles.get("header"));
+        }
+
+        int rownum = 2;
+        for (int i = 0; i < 10; i++) {
+            Row row = sheet.createRow(rownum++);
+            for (int j = 0; j < titles.length; j++) {
+                Cell cell = row.createCell(j);
+                if (j == 9) {
+                    //the 10th cell contains sum over week days, e.g. SUM(C3:I3)
+                    String ref = "C" + rownum + ":I" + rownum;
+                    cell.setCellFormula("SUM(" + ref + ")");
+                    cell.setCellStyle(styles.get("formula"));
+                } else if (j == 11) {
+                    cell.setCellFormula("J" + rownum + "-K" + rownum);
+                    cell.setCellStyle(styles.get("formula"));
                 } else {
-                    row.getCell(j).setCellValue((Double)sample_data[i][j]);
+                    cell.setCellStyle(styles.get("cell"));
                 }
             }
         }
-
-        //finally set column widths, the width is measured in units of 1/256th of a character width
-        sheet.setColumnWidth(0, 30*256); //30 characters wide
-        for (int i = 2; i < 9; i++) {
-            sheet.setColumnWidth(i, 6*256);  //6 characters wide
-        }
-        sheet.setColumnWidth(10, 10*256); //10 characters wide
-        return workbook;
+        return rownum;
     }
 
-    private Map<String,CellStyle> createStyles(Workbook workbook) {
+    private void titleRow(Map<String, CellStyle> styles, Sheet sheet) {
+        Row titleRow = sheet.createRow(0);
+        titleRow.setHeightInPoints(45);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Weekly TimesheetReport");
+        titleCell.setCellStyle(styles.get("title"));
+        sheet.addMergedRegion(CellRangeAddress.valueOf("$A$1:$L$1"));
+    }
+
+    private void setupPrint(Sheet sheet) {
+        PrintSetup printSetup = sheet.getPrintSetup();
+        printSetup.setLandscape(true);
+        sheet.setFitToPage(true);
+        sheet.setHorizontallyCenter(true);
+    }
+
+    private Map<String, CellStyle> createStyles(Workbook workbook) {
         Map<String, CellStyle> styles = new HashMap<String, CellStyle>();
         CellStyle style;
         Font titleFont = workbook.createFont();
-        titleFont.setFontHeightInPoints((short)18);
+        titleFont.setFontHeightInPoints((short) 18);
         titleFont.setBold(true);
         style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
@@ -142,7 +178,7 @@ public class Timesheet implements Report{
         styles.put("title", style);
 
         Font monthFont = workbook.createFont();
-        monthFont.setFontHeightInPoints((short)11);
+        monthFont.setFontHeightInPoints((short) 11);
         monthFont.setColor(IndexedColors.WHITE.getIndex());
         style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
