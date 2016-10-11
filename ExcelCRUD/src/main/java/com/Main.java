@@ -4,6 +4,8 @@ import com.reports.TimesheetReport;
 import com.util.ExcelUtil;
 
 public class Main {
+    private Main() {
+    }
 
     public static void main(String[] args) {
         ExcelUtil excelUtil = new ExcelUtil();
