@@ -1,38 +1,44 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Test project</title>
-        <link href="/css/style.css" rel="stylesheet"/>
-        <script src="webjars/jquery/3.1.1-1/jquery.js"></script>
-        <script src="/js/main.js"></script>
-    </head>
-    <body>
-        <div id="container">
-            <div id="header">
-                <span id="site_name"> Header of Spring Boot Training Project</span>
-            </div>
-            <div id="left_block">
-                <div id="main_menu">
-                    <ul>
-                        <li>
-                            <a href="/">Home</a>
-                        </li>
-                        <li>
-                            <a href="#!headers.html" onclick="loadHtmlFile(this);">Headers</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div id="central_block">
-                central_block
-            </div>
-            <div id="right_block">
-                right_block
-            </div>
-            <div id="footer">
-                footer
-            </div>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Test project</title>
+    <link href="/css/style.css" rel="stylesheet"/>
+    <script src="webjars/angularjs/1.6.2/angular.min.js"></script>
+    <script src="webjars/angularjs/1.6.2/angular-route.min.js"></script>
+    <script src="/js/mainAngular.js"></script>
+</head>
+<body ng-app="myApp">
+<div id="container">
+    <div id="header">
+        <span id="site_name"> Header of Spring Boot Training Project</span>
+    </div>
+    <div id="left_block">
+        <div id="main_menu">
+            <ul>
+                <li>
+                    <a href="/">Home</a>
+                </li>
+                <li>
+                    <a href="#!/headers">Headers</a>
+                </li>
+                <li>
+                    <a href="#!/readingBooks">Reading books</a>
+                </li>
+                <li>
+                    <a href="#!/greeting">Greeting</a>
+                </li>
+            </ul>
         </div>
-    </body>
+    </div>
+    <div id="central_block">
+        <div class="ng-view"></div>
+    </div>
+    <div id="right_block">
+        right_block
+    </div>
+    <div id="footer">
+    </div>
+</div>
+</body>
 </html>

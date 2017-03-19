@@ -3,7 +3,7 @@
  */
 
 function loadCenterBlock(fileName) {
-    $('#central_block').load('./view/' + fileName, function (response, status, xhr) {
+    $('#central_block').load('./views/' + fileName, function (response, status, xhr) {
         if (status == "error") {
             var msg = "File uploading error:<br />";
             $("#central_block").html(msg + xhr.status + " " + xhr.statusText);

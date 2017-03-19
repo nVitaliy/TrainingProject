@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.List;
 
 @Controller
-@RequestMapping("/book")
+@RequestMapping("/readingBooks")
 public class ReadingBookController {
 
     private ReadingBookRepository readingBook;
@@ -22,7 +22,7 @@ public class ReadingBookController {
         this.readingBook = readingBook;
     }
 
-    @RequestMapping(value = "/book/{reader}", method = RequestMethod.GET)
+    @RequestMapping(value = "/readingBooks/{reader}", method = RequestMethod.GET)
     public String readersBooks(@PathVariable("reader") String reader, Model model) {
 
         List<Book> booksByReaders = readingBook.findByReader(reader);
@@ -31,9 +31,11 @@ public class ReadingBookController {
         }
         return "book/readingBook";
     }
-    @RequestMapping(value = "book/{reader}", method = RequestMethod.POST)
-    public String addToReading(@PathVariable("reader") String reader){
 
+    @RequestMapping(value = "readingBooks/{reader}", method = RequestMethod.POST)
+    public String addToReading(@PathVariable("reader") String reader, Book book) {
+        book.setReader(reader);
+        readingBook.save(book);
         return "redirect:/book/{reader}";
     }
 }
