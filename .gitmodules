@@ -1,0 +1,3 @@
+[submodule "licensing-service"]
+	path = licensing-service
+	url = https://github.com/nVitaliy/licensing-service.git
