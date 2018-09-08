@@ -1,0 +1,6 @@
+version: '3'
+services:
+  licensingservice:
+    image: study-licensing-service:ls2
+    ports:
+    - "8080:8080"
