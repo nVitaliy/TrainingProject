@@ -4,3 +4,10 @@ services:
     image: study-licensing-service:ls2
     ports:
     - "8080:8080"
+    environment:
+      PROFILE: "default"
+      CONFIGSERVER_URI: http://configserver:8889
+      CONFIGSERVER_PORT: "8889"
+      DATABASESERVER_PORT: "5432"
+
+
