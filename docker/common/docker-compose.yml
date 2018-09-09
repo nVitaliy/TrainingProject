@@ -9,5 +9,16 @@ services:
       CONFIGSERVER_URI: http://configserver:8889
       CONFIGSERVER_PORT: "8889"
       DATABASESERVER_PORT: "5432"
-
+  configserver:
+    image: confsvr:ch3
+    ports:
+    - "8889:8889"
+  database:
+    image: postgres:9.5
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "eagle_eye_local"
 
