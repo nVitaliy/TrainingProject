@@ -4,3 +4,6 @@
 [submodule "configuration-service"]
 	path = configuration-service
 	url = https://github.com/nVitaliy/configuration-service
+[submodule "organization-service"]
+	path = organization-service
+	url = https://github.com/nVitaliy/organization-service
