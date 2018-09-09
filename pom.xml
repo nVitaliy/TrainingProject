@@ -20,6 +20,7 @@
     <modules>
         <module>configuration-service</module>
         <module>licensing-service</module>
+        <module>organization-service</module>
     </modules>
 
     <build>

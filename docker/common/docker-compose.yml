@@ -1,14 +1,5 @@
 version: '3'
 services:
-  licensingservice:
-    image: study-licensing-service:ls2
-    ports:
-    - "8080:8080"
-    environment:
-      PROFILE: "default"
-      CONFIGSERVER_URI: http://configserver:8889
-      CONFIGSERVER_PORT: "8889"
-      DATABASESERVER_PORT: "5432"
   configserver:
     image: confsvr:ch3
     ports:
@@ -21,4 +12,23 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "eagle_eye_local"
+  kafkaserver:
+    image: spotify/kafka
+    ports:
+    - "2181:2181"
+    - "9092:9092"
+  licensingservice:
+    image: study-licensing-service:ls2
+    ports:
+    - "8080:8080"
+    environment:
+      PROFILE: "default"
+      CONFIGSERVER_URI: http://configserver:8889
+      CONFIGSERVER_PORT: "8889"
+      DATABASESERVER_PORT: "5432"
+    depends_on:
+      - configserver
+      - database
+      - kafkaserver
+
 
